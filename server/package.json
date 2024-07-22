@@ -1,0 +1,19 @@
+{
+	"name": "act-ls-server",
+	"description": "ACT language server",
+	"version": "1.0.0",
+	"author": "Karthi Srinivasan",
+	"license": "GPL-3.0-only",
+	"engines": {
+		"node": "*"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/karthisrinivasan/act-ls.git"
+	},
+	"dependencies": {
+		"vscode-languageserver": "^9.0.1",
+		"vscode-languageserver-textdocument": "^1.0.11"
+	},
+	"scripts": {}
+}

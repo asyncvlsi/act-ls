@@ -1,0 +1,8 @@
+.DS_Store
+*.act
+*.vsix
+.actsim_history
+out
+node_modules
+client/server
+.vscode-test
