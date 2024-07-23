@@ -13,12 +13,21 @@ import {
 	TextDocumentSyncKind,
 	InitializeResult,
 	DocumentDiagnosticReportKind,
-	type DocumentDiagnosticReport
+	type DocumentDiagnosticReport,
+	TextDocumentIdentifier,
+	Definition,
+	Location,
+	URI,
+	DocumentUri,
+	LocationLink,
+	Range
 } from 'vscode-languageserver/node';
 
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
+
+// import { ReferenceManager } from './reference-manager';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed features.
@@ -26,6 +35,8 @@ const connection = createConnection(ProposedFeatures.all);
 
 // Create a simple text document manager.
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+
+// const refManager: ReferenceManager = new ReferenceManager(documents, connection);
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
@@ -59,6 +70,8 @@ connection.onInitialize((params: InitializeParams) => {
 				interFileDependencies: false,
 				workspaceDiagnostics: false
 			}
+			// ,
+			// definitionProvider : true
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -67,6 +80,9 @@ connection.onInitialize((params: InitializeParams) => {
 				supported: true
 			}
 		};
+	};
+	if (hasWorkspaceFolderCapability) {
+		// refManager.updateWorkspaceReferences(params.workspaceFolders!) ;
 	}
 	return result;
 });
@@ -154,6 +170,7 @@ connection.languages.diagnostics.on(async (params) => {
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
 	validateTextDocument(change.document);
+	// refManager.updateDocumentReferences(change.document.uri);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
@@ -725,8 +742,8 @@ connection.onCompletionResolve(
 			item.documentation = '';
 		}
 		else if (item.data === 43) {
-			item.detail = '';
-			item.documentation = 'Assert that two signals are exclusive-low';
+			item.detail = 'Assert that two signals are exclusive-low';
+			item.documentation = '';
 		}
 		else if (item.data === 44) {
 			item.detail = 'Force two signals to be exclusive-high in simulation';
@@ -783,6 +800,34 @@ connection.onCompletionResolve(
 		return item;
 	}
 );
+
+// connection.onDefinition((params) => {
+// 	const uri = params.textDocument.uri;
+// 	const document = documents.get(uri);
+	// const {parser, parseTree, visitor} = ensureParsed(document);
+	// const pos = params.position;
+	// if (document) {
+	// 	const range = Range.create(document.positionAt(0), document.positionAt(10));
+		// return Location.create(uri, {
+		// 	start: { line: 2, character: 5 },
+		// 	end: { line: 2, character: 6 }
+		//   });
+	// }
+	// return (Location,undefined) as Promise<Location>;
+	// return  as Promise<Location[]>;
+	// return pos;
+	// const position = computeTokenPosition(parseTree, parser.inputStream,
+	// 	{ line: pos.line + 1, column: pos.character });
+	// const position = 
+	// if(position && position.context) {
+	// 	const scope = getScope(position.context, visitor.symbolTable);
+	// 	const definition = findDefinition(position.context.text, scope);
+	// 	if(definition && definition.location) {
+	// 		return {...definition.location, originSelectionRange: getRange(position.context) };
+	// 	}
+	// }
+// 	return undefined;
+// });
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events
