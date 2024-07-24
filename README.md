@@ -5,6 +5,7 @@
 
 This Language Server works for [ACT](https://github.com/asyncvlsi/act) files. It currently has the following language features:
 - Completions
+- Hover definitions
 
 ## Installation
 
