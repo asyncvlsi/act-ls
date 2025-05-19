@@ -35,3 +35,7 @@ Install through Visual Studio Code Marketplace.
 - Press ▷ to run the launch config (F5).
 - In the [Extension Development Host](https://code.visualstudio.com/api/get-started/your-first-extension#:~:text=Then%2C%20inside%20the%20editor%2C%20press%20F5.%20This%20will%20compile%20and%20run%20the%20extension%20in%20a%20new%20Extension%20Development%20Host%20window.) instance of VSCode, open a document in 'act' language mode.
 
+
+## Changing the Publisher
+
+- Change the publisher in `package.json` and follow the instructions here: https://code.visualstudio.com/api/working-with-extensions/publishing-extension
