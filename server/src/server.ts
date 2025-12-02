@@ -20,7 +20,10 @@ import {
 	URI,
 	DocumentUri,
 	LocationLink,
-	Range
+	Range,
+	MarkedString,
+	MarkupContent,
+	MarkupKind
 } from 'vscode-languageserver/node';
 
 import {
@@ -566,6 +569,12 @@ connection.onCompletion(
 				kind: CompletionItemKind.Text,
 				data: 56
 			}
+			,
+			{
+				label: 'defptype',
+				kind: CompletionItemKind.Text,
+				data: 57
+			}
 		];
 	}
 );
@@ -600,7 +609,7 @@ connection.onCompletionResolve(
 		}
 		else if (item.data === 7) {
 			item.detail = 'Define a cell';
-			item.documentation = '';
+			item.documentation = 'Warning: Must be a self-contained (non-hierarchical) circuit. Do not instantiate other cells/processes inside.';
 		}
 		else if (item.data === 8) {
 			item.detail = 'Define a channel';
@@ -620,7 +629,7 @@ connection.onCompletionResolve(
 		}
 		else if (item.data === 12) {
 			item.detail = 'output variable name for functions';
-			item.documentation = '';
+			item.documentation = 'The special variable self can be used in the body of the CHP language, and its value on termination of the CHP program indicates the return value.';
 		}
 		else if (item.data === 13) {
 			item.detail = 'Methods body for deftype objects';
@@ -660,7 +669,10 @@ connection.onCompletionResolve(
 		}
 		else if (item.data === 22) {
 			item.detail = 'Define an interface for a process';
-			item.documentation = '';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['[Documentation](https://avlsi.csl.yale.edu/act/doku.php?id=language:interface)'
+				].join('\n') };
+			item.documentation = contents;
 		}
 		else if (item.data === 23) {
 			item.detail = 'Empty chp action that does nothing';
@@ -672,11 +684,18 @@ connection.onCompletionResolve(
 		}
 		else if (item.data === 25) {
 			item.detail = 'Pre-defined boolean data type';
-			item.documentation = '';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: 'Use `bool x;` to declare a Boolean `x`. Use `bool(expr)` to convert an expression to a Boolean expression.' };
+			item.documentation = contents;
 		}
 		else if (item.data === 26) {
 			item.detail = 'Pre-defined integer data type';
-			item.documentation = '';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['- Use `int<W> x;` to declare a integer `x` of width `W` bits.',
+				'- Use `int(expr,W)` to convert an expression to integer of `W` bits. This takes the bottom `W` bits of the expression.', 
+				'- Use `int(pure_struct_object)` to convert a pure-structure object to its integer representation, i.e. concatenation of fields.'
+				].join('\n') };
+			item.documentation = contents;
 		}
 		else if (item.data === 27) {
 			item.detail = 'Parametric integer type';
@@ -700,7 +719,12 @@ connection.onCompletionResolve(
 		}
 		else if (item.data === 32) {
 			item.detail = 'Pre-defined enumeration type';
-			item.documentation = '';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['- Syntax: `enum<N> x;`',
+				'- The variable `x` can take on values from `0` to `N-1`.',
+				'- [Documentation](https://avlsi.csl.yale.edu/act/doku.php?id=language:types)'
+				].join('\n') };
+			item.documentation = contents;
 		}
 		else if (item.data === 33) {
 			item.detail = 'Define a CHP sublanguage body';
@@ -779,24 +803,66 @@ connection.onCompletionResolve(
 			item.documentation = '';
 		}
 		else if (item.data === 52) {
-			item.detail = 'Capacitor';
-			item.documentation = '';
+			item.detail = 'Define a capacitor ';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['- Syntax: `cap<SZ1,SZ2> (node1,node2);``',
+				'- Define a capacitor of `SZ1*SZ2` units between nodes `node1` and `node2`.',
+				'- Both sizes are assumed to be `1` if unspecified',
+				'- Only within a `prs` body.',
+				'- [Documentation](https://avlsi.csl.yale.edu/act/doku.php?id=language:langs:prs)'
+				].join('\n') };
+			item.documentation = contents;
 		}
 		else if (item.data === 53) {
 			item.detail = 'Define a macro';
-			item.documentation = '';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['- Can be defined for any user-defined type (except parameter structures)`',
+				'- Essentially a chp fragment that is substituted in place where it is used.',
+				'- Basic Syntax: `defproc p () { methods { macro <name> (int <arg>) { <macro_body> } } }`',
+				'- [Documentation](https://avlsi.csl.yale.edu/act/doku.php?id=language:types2)'
+				].join('\n') };
+			item.documentation = contents;
 		}
 		else if (item.data === 54) {
-			item.detail = 'Define an enumeration';
-			item.documentation = '';
+			item.detail = 'Define a new enumeration type';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['- Syntax: `defenum myenum {ADD, SUB, MULT};`',
+				'- Cannot assign variable of `myenum` type to an int - this will result in an error',
+				'- [Documentation](https://avlsi.csl.yale.edu/act/doku.php?id=language:types2:data)'
+				].join('\n') };
+			item.documentation = contents;
 		}
 		else if (item.data === 55) {
 			item.detail = 'Define a CHP-TXT sublanguage body';
-			item.documentation = '';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['- Send: `send(Channel,expr)`',
+				'- Receive: `recv(Channel,variable)`',
+				'- Conditional: `select {case g1 : S1; case g2 : S2; ... case gn: Sn}` with optional `else : Sn` as last',
+				'- Wait for condition: `wait-for(condition)`',
+				'- While loop: `while (G) { S }`',
+				'- While loop with multiple guards: `while {case g1 : S1; case g2 : S2; ... case gn: Sn}`',
+				'- Infinite loop: `forever { S }`',
+				'- [Documentation](https://avlsi.csl.yale.edu/act/doku.php?id=language:langs:chp)'
+				].join('\n') };
+			item.documentation = contents;
 		}
 		else if (item.data === 56) {
-			item.detail = 'Transmission gate (Gn,Gp,S,D)';
-			item.documentation = 'blah';
+			item.detail = 'Define a transmission gate';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['- Syntax: `transgate(ngate,pgate,source,drain) x;`',
+				'- [Documentation](https://avlsi.csl.yale.edu/act/doku.php?id=tools:netgen)'
+				].join('\n') };
+			item.documentation = contents;
+		}
+		else if (item.data === 57) {
+			item.detail = 'Define a parameter structure';
+			const contents: MarkupContent = { kind: 'markdown',
+			value: ['- Convenient wrapper for a group of parameters (pints, pbools, preals) to simplify templates',
+				'- Example: `defptype pt (pint a; pint b);`',
+				'- You can now use an object of type `pt` as a template parameter: `template<pt x_pt> defproc p () {}`.',
+				'- [Documentation](https://avlsi.csl.yale.edu/act/doku.php?id=language:types2:data)'
+				].join('\n') };
+			item.documentation = contents;
 		}
 		return item;
 	}

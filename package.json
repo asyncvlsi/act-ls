@@ -3,7 +3,7 @@
 	"description": "Language server for the ACT language",
 	"author": "Karthi Srinivasan",
 	"license": "GPL-3.0-only",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/asyncvlsi/act-ls"
